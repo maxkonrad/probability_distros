@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,34 +10,25 @@
             font-family: Arial, sans-serif;
             margin: 20px;
         }
-
         .controls {
             margin-bottom: 20px;
         }
-
         .output {
             margin-top: 20px;
         }
-
         table {
             border-collapse: collapse;
             margin-top: 20px;
         }
-
-        table,
-        th,
-        td {
+        table, th, td {
             border: 1px solid black;
         }
-
-        th,
-        td {
+        th, td {
             padding: 8px;
             text-align: center;
         }
     </style>
 </head>
-
 <body>
     <h1>Probability IZTECH EE</h1>
     <div class="controls">
@@ -77,7 +67,7 @@
         <div id="chart"></div>
 
         <footer>
-            <p>Made with &hearts; by <a href="https://furkanselek.net">Furkan Selek</a></p>
+            <p>Created by <a href="https://furkanselek.net">Furkan Selek</a> with &hearts;</p>
         </footer>
     </div>
 
@@ -112,14 +102,7 @@
         function generateData() {
             const distribution = document.getElementById('distribution').value;
             const numVariables = parseInt(document.getElementById('numVariables').value, 10);
-            if (numVariables < 30) {
-                alert('Number of variables must be greater than 30 for plot!');
-                return;
-            }
-            if (numVariables > 10000) {
-                alert('Number of variables must be less than 10000!');
-                return;
-            }
+
             let data = [];
             let theoreticalMean, theoreticalVariance;
 
@@ -193,19 +176,10 @@
                 .nice()
                 .range([margin.left, width - margin.right]);
 
-            const [min, max] = d3.extent(data);
-            const binCount = Math.min(15, data.length);
-            const thresholds = d3.range(min, max, (max - min) / binCount);
-            const bins = d3.bin()
-                .domain(x.domain())
-                .thresholds(thresholds)(data);
+            const bins = d3.bin().domain(x.domain()).thresholds(30)(data);
 
-            const normalization_factor = data.length * (max - min) / binCount;
-
-            const total_area = bins.reduce((sum, bin) => sum + (bin.length / normalization_factor) * (bin.x1 - bin.x0), 0);
-            console.log(total_area);
             const y = d3.scaleLinear()
-                .domain([0, d3.max(bins, d => d.length / normalization_factor)])
+                .domain([0, d3.max(bins, d => d.length)])
                 .nice()
                 .range([height - margin.bottom, margin.top]);
 
@@ -216,8 +190,8 @@
                 .join('rect')
                 .attr('x', d => x(d.x0) + 1)
                 .attr('width', d => Math.max(0, x(d.x1) - x(d.x0) - 1))
-                .attr('y', d => y(d.length / normalization_factor))
-                .attr('height', d => y(0) - y(d.length / normalization_factor));
+                .attr('y', d => y(d.length))
+                .attr('height', d => y(0) - y(d.length));
 
             svg.append('g')
                 .attr('transform', `translate(0,${height - margin.bottom})`)
@@ -238,12 +212,11 @@
                     .attr('dy', '.71em')
                     .attr('fill', 'black')
                     .attr('text-anchor', 'start')
-                    .text('PDF'));
+                    .text('Frequency'));
         }
 
         updateParameters();
         generateData();
     </script>
 </body>
-
 </html>
